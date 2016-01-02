@@ -274,9 +274,6 @@ function countFeed(){
                 return;
             }
 			
-			location.href="index2.php?mobile="+getQueryString("mobile");
-
-			return;
 			//提交
 			 $.ajax({
 			type: 'GET',
