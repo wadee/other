@@ -1,4 +1,4 @@
-﻿<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
 <?php
 require("wxsdk.php");
 ?>

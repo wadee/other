@@ -1,11 +1,8 @@
-﻿<?php
+<?php
 require "../config.php";
-$wgateid=$_GET['wgateid'];
-$phone=$_GET['phone'];
+$mobile=$_GET['mobile'];
 
-
-
-$insert_sql="insert into ".$tablename." (id,phonenum) VALUES ('".$wgateid."','".$phone."')";
+$insert_sql="insert into ".$tablename." (phonenum) VALUES ('".$mobile."')";
 mysql_query($insert_sql,$myconn);
 echo mysql_error();
 echo "true";

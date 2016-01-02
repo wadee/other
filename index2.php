@@ -43,36 +43,71 @@ require "wxconfig.php" ;
 } 
 
 checkcount();
-function checkcount(){
+
+function countFeed(tele){
+			$.ajax({
+				type: 'GET',
+				url: "http://xz.lifejrj.cn:8080/api/countFeed.json",
+				data: {
+					mobile : tele
+				},
+				success: function(data) {
+
+					checkcount(data);
+
+					// if(data != true )
+					// {
+
+					//    form_show();
+					   
+					// }
+
+				},
+				error: function() {
+					alert("checkwgateid出错了");
+					return null;
+				}
+			});
+	}
+
+function checkcount(countFeed){
 
 		//检查是否可玩
 		$.ajax({
 					type: 'GET',
 					url: "action/checkcount.php",
 					data: {
-						wgateid: getQueryString("wgateid"),
-						ingame:1
-						
+						mobile: getQueryString("mobile"),
+						ingame:0,
 					},
 					success: function(data) {
 
-						if(eval('('+data+')')!="0")
-						{
-						   
+						var checkcount = data;
+
+						if ((checkcount - 2) <= countFeed) {
+							location.href="index2.php?mobile="+getQueryString("mobile");
+						}else{
+							share_show();
 						}
-						else
-						{
-						  location.href="index.php?wgateid="+getQueryString("wgateid");
-						}
+
+						// if(eval('('+data+')')!="0")
+						// console.log(eval('('+data+')'));
+						// if(data != null)
+						// {
+						//    location.href="index2.php?wgateid="+getQueryString("wgateid");
+						// }
+						// else
+						// {
+						// 	share_show();
+						// 	return false;
+						// }
 					},
 					error: function() {
-						alert("checkcount出错了");
-						return null;
+						// alert("checkcount出错了");
+						return 0;
 					}
 				});
 }
-
-
 
 		var mebtnopenurl = 'http://www.weiadmin.cn/index.php?g=Wap&m=Index&a=index&token=xkfcxd1402407094&from=singlemessage&isappinstalled=0';
 
@@ -128,7 +163,7 @@ function checkcount(){
 								type: 'GET',
 								url: "action/submitscore.php",
 								data: {
-									wgateid: getQueryString("wgateid"),
+									mobile: getQueryString("mobile"),
 									score:score
 					
 								},

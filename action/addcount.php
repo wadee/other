@@ -1,9 +1,14 @@
-﻿<?php
+<?php
+// require "../config.php";
+// $mobile=$_GET['mobile'];
+
+// $sql="update ".$tablename." set current_count=0 where id= '".$mobile."'";
+// mysql_query($sql,$myconn);
+
 require "../config.php";
-$wgateid=$_GET['wgateid'];
+$mobile=$_GET['mobile'];
 
-$sql="update ".$tablename." set current_count=1 where id= '".$wgateid."'";
-mysql_query($sql,$myconn);
-
-
-?>
+$insert_sql="insert into ".$tablename." (phonenum) VALUES ('".$mobile."')";
+mysql_query($insert_sql,$myconn);
+echo mysql_error();
+echo "true";

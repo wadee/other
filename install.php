@@ -1,4 +1,4 @@
-﻿<html>
+<html>
 <head>
 <title>建立数据库</title>
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -21,10 +21,10 @@ session_start();
 mysql_query("SET NAMES 'utf8'",$my_connect);
 
 $sql="CREATE TABLE ".$tablename."(
-						id varchar(50)  NOT NULL,
+						id int  NOT NULL AUTO_INCREMENT,
 						PRIMARY KEY(id),
                         phonenum varchar(20) NOT NULL,
-						current_count int NOT NULL DEFAULT 3,
+						current_count int NOT NULL DEFAULT 0,
 						last_play varchar(20) DEFAULT 'empty',
 						score int DEFAULT 0)";
 						

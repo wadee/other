@@ -14,9 +14,6 @@
 <link href="./qqgame_files/style.css" rel="stylesheet" type="text/css">
 
 <div style="display:none">
-<?php
-require "wxconfig.php" ;
-?>
 <script type="text/javascript">
   /*(function() {
     WgateJs = {};
@@ -47,7 +44,7 @@ require "wxconfig.php" ;
 
 <section class="sec sec-1" id="sec-1">
 
-<a href="javascript:void(0);" onclick="game_start();">
+<a href="javascript:void(0);" id="bg_container" onclick="game_start();">
 <img class="p1t1 p1z2 show" src="./qqgame_files/bg_2.jpg" width="100%" alt="">
 </a>
 
@@ -84,7 +81,7 @@ require "wxconfig.php" ;
 <div class="form_kuang">
 <img src="./qqgame_files/userform.png" alt="" width="90%">
 <div class="dlg_submit">
-<div class="input_row"><span class="label" style="font-size:16px;">手机号：</span><input type="text" id="phone"></div>
+<div class="input_row"><span class="label" style="font-size:16px;">手机号：</span><input type="text" id="phone" value="<?=$_GET['mobile']?>"></div>
 <div class="dlg_submitbtn button"><a href="javascript:void(0);" onclick="baoming();"><img class="big_head" src="./qqgame_files/sendbtn.png" alt="" width="40%"></a></div>
 </div>
 </div>
@@ -108,7 +105,13 @@ require "wxconfig.php" ;
  <script src="jquery.min.js" type="text/javascript"></script> 
 <script type="text/javascript">
 window.isshare=false;
-checkwgateid();
+window.fromapp=false;
+// checkwgateid();
+
+
+$('#bg_container').click(function(){
+	checktelephone();	
+})
 
 function share_show(){
 	$("#sharelayer").show();
@@ -144,17 +147,29 @@ function form_close(){
     $(".userform").hide();
 }
 
-
 function game_start(){
-    
-	if(window.isshare==true)
-	{
-	 addcount();	
-	}
-	else
-	{
-	 checkcount();
-	}
+	 checkwgateid();	
+	 countFeed();
+}
+
+
+function checkwgateid(){
+	$.ajax({
+					type: 'GET',
+					url: "action/checkwgateid.php",
+					data: {
+						mobile: getQueryString("mobile")	
+					},
+					success: function(data) {
+						if(data == 0){
+							addcount();
+						}
+					},
+					error: function() {
+						alert("checkcount出错了");
+						return null;
+					}
+				});	
 }
 
 function addcount(){
@@ -163,10 +178,10 @@ function addcount(){
 					type: 'GET',
 					url: "action/addcount.php",
 					data: {
-						wgateid: getQueryString("wgateid")	
+						mobile: getQueryString("mobile")	
 					},
 					success: function(data) {
-					  location.href="index2.php?wgateid="+getQueryString("wgateid");
+					  // location.href="index2.php?mobile="+getQueryString("mobile");
 					},
 					error: function() {
 						alert("checkcount出错了");
@@ -175,62 +190,76 @@ function addcount(){
 				});
 }
 
-function checkcount(){
+function checkcount(countFeed){
 
 		//检查是否可玩
 		$.ajax({
 					type: 'GET',
 					url: "action/checkcount.php",
 					data: {
-						wgateid: getQueryString("wgateid"),
-						ingame:0
-						
+						mobile: getQueryString("mobile"),
+						ingame:0,
 					},
 					success: function(data) {
 
-						if(eval('('+data+')')!="0")
-						{
-						   location.href="index2.php?wgateid="+getQueryString("wgateid");
-						}
-						else
-						{
+						var checkcount = data;
+
+						if ((checkcount - 3) <= countFeed) {
+							location.href="index2.php?mobile="+getQueryString("mobile");
+						}else{
 							share_show();
-							return false;
 						}
+
+						// if(eval('('+data+')')!="0")
+						// console.log(eval('('+data+')'));
+						// if(data != null)
+						// {
+						//    location.href="index2.php?wgateid="+getQueryString("wgateid");
+						// }
+						// else
+						// {
+						// 	share_show();
+						// 	return false;
+						// }
 					},
 					error: function() {
-						alert("checkcount出错了");
-						return null;
+						// alert("checkcount出错了");
+						return 0;
 					}
 				});
 }
 
 
-function checkwgateid(){
+
+function checktelephone(){
+	var phone = $('#phone').val();
+
+	if (!phone) {
+		form_show();		
+	}else{
+		baoming();
+	};
+
+}
+
+
+function countFeed(){
 			$.ajax({
 				type: 'GET',
-				url: "action/checkwgateid.php",
+				url: "http://xz.lifejrj.cn:8080/api/countFeed.json",
 				data: {
-					wgateid: getQueryString("wgateid")
+					mobile : getQueryString("mobile"),
 				},
 				success: function(data) {
 
-					if(eval('('+data+')')!=true)
-					{
-
-					   form_show();
-					   
-					}
+					checkcount(data);
 
 				},
 				error: function() {
-					alert("checkwgateid出错了");
 					return null;
 				}
 			});
-	
-
-}
+	}
 
         function baoming() {
             var tel = $("#phone").val();
@@ -245,29 +274,28 @@ function checkwgateid(){
                 return;
             }
 			
+			window.fromapp = true;
+
+			return;
 			//提交
 			 $.ajax({
 			type: 'GET',
-			url: "action/submit.php",
+			url: "http://xz.lifejrj.cn:8080/api/hasUser.json",
 			data: {
-				wgateid: getQueryString("wgateid"),
-				phone:tel
+				mobile:tel
 			},
 			success: function(data) {
-
 				if(eval('('+data+')')==true)
 				{
-
-			       form_close();
-				   
+			       // form_close();
+			       window.fromapp = true;
 				}
 				else
 				{
-					alert("报名失败！原因:"+data);
+					location.href="index2.php?mobile="+getQueryString("mobile");
 				}
 			},
 			error: function() {
-				alert("submit出错啦");
 				return null;
 			}
 		});

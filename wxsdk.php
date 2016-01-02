@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 //js-sdk开关
 $applyapi=true;
 
@@ -49,7 +49,7 @@ function make_signature($nonceStr,$timestamp,$jsapi_ticket,$url)
 function make_ticket($appId,$appsecret)
 {
 	// access_token 应该全局存储与更新，以下代码以写入到文件中做示例
-	$data = json_decode(file_get_contents("../../apptoken/access_token.json"));
+	$data = json_decode(file_get_contents("./apptoken/access_token.json"));
 
 	if ($data->expire_time < time()) {
 		$TOKEN_URL="https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$appId."&secret=".$appsecret;
@@ -59,7 +59,7 @@ function make_ticket($appId,$appsecret)
 		if ($access_token) {
 			$data->expire_time = time() + 7000;
 			$data->access_token = $access_token;
-			$fp = fopen("../../apptoken/access_token.json", "w");
+			$fp = fopen("./apptoken/access_token.json", "w");
 			fwrite($fp, json_encode($data));
 			fclose($fp);
 		}
@@ -68,7 +68,7 @@ function make_ticket($appId,$appsecret)
 	}
 
 	// jsapi_ticket 应该全局存储与更新，以下代码以写入到文件中做示例
-	$data = json_decode(file_get_contents("../../apptoken/jsapi_ticket.json"));
+	$data = json_decode(file_get_contents("./apptoken/jsapi_ticket.json"));
 	if ($data->expire_time < time()) {
 		$ticket_URL="https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=".$access_token."&type=jsapi";
 		$json = file_get_contents($ticket_URL);
@@ -77,7 +77,7 @@ function make_ticket($appId,$appsecret)
 		if ($ticket) {
 			$data->expire_time = time() + 7000;
 			$data->jsapi_ticket = $ticket;
-			$fp = fopen("../../apptoken/jsapi_ticket.json", "w");
+			$fp = fopen("./apptoken/jsapi_ticket.json", "w");
 			fwrite($fp, json_encode($data));
 			fclose($fp);
 		}

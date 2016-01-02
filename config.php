@@ -1,12 +1,12 @@
 <?php
 //主机地址，一般为localhost不用改
-$dbhost = '127.0.0.1';
+$dbhost = '127.0.0.1:3306';
 //数据库名
-$dbname = 'iamtaotao123';
+$dbname = 'other';
 //用户名
-$dbuser = 'iamtaotao123';
+$dbuser = 'root';
 //密码
-$dbpwd = '24362436';
+$dbpwd = '123456';
 //表名
 $tablename = 'jinrongjie_05';
 
