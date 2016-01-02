@@ -1,10 +1,10 @@
 <?php
 require "../config.php";
-$wgateid=$_GET['wgateid'];
+$mobile=$_GET['mobile'];
 $score=$_GET['score'];
 
 
-$sql="update ".$tablename." set score=score+".$score." where id= '".$wgateid."'";
+$sql="update ".$tablename." set score=score+".$score." where phonenum= '".$mobile."'";
 mysql_query($sql,$myconn);
 
 ?>

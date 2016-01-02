@@ -15,7 +15,6 @@
 
 <div style="display:none">
 <?php
-require "wxconfig.php" ;
 require "config.php" ;
 ?>
 <script type="text/javascript">
@@ -72,7 +71,7 @@ text-align:right;
 
 <img class="p1t1 p1z2 show" src="./qqgame_files/p1_bg.jpg" width="100%" alt="">
 
-<div style="width:100%;position:fixed;bottom:12%;left:0; z-index:10000">
+<div style="width:100%;position:fixed;bottom:12%;left:0; z-index:10000" id="footerbanner">
  <a href="http://xz.lifejrj.cn/erweima1"><img src="./qqgame_files/app.png" style="width:100%"></a>
 </div> 
 
@@ -99,24 +98,29 @@ text-align:right;
 	$rank=1;
 	$strSql="select phonenum,score from ".$tablename." order by score desc limit 50";
 	$result=mysql_query($strSql,$myconn);
-	while($row = mysql_fetch_array($result))
+	
+	for( $rank = 0; $rank < 50; $rank++)
 	{
+		$row = mysql_fetch_array($result);
+		if (empty($row)){
+			break;
+		}
+		$mobile = $_GET['mobile'];
 ?>
 
-	<tr>
-	<td class="td1"><?echo $rank;?></td>
-	<td class="td2"><?echo "**".substr($row["phonenum"],-4)?></td>
-	<td class="td3"><?echo $row["score"]?>楼</td>
+	<tr <?php if($mobile == $row['phonenum']) :?>style="color:red;"<?php endif;?>>
+	<td class="td1"><?=$rank + 1 ;?></td>
+	<td class="td2"><?= substr($row["phonenum"],0,3) . "**" . substr($row["phonenum"],-4)?></td>
+	<td class="td3"><?= $row["score"]?>楼</td>
 	</tr>
 <?php 
-$rank++;
 }
 ?>
 
 </table>
 </div>
 <div class="rankbottombtn button ">你的总成绩<span id="user_score" style="color:red"></span>楼,排名第<span id="user_rank" style="color:red"></span>位</div>
-<a href="javascript:void(0);" onclick="yxsm_show();"><div class="rankbottombtn button">活动详细规则 ></div></a>
+<a href="/index.php?mobile=<?=$_GET['mobile']?>"><div class="rankbottombtn button">再玩一次></div></a>
 
 </div>
 </div>
@@ -139,6 +143,7 @@ $rank++;
 
 form_show();
 setRankText();
+baoming();
 //yxsm_show();
 function yxsm_show(){
     form_close();
@@ -173,7 +178,7 @@ function setRankText(){
 			type: 'GET',
 			url: "action/getuserrank.php",
 			data: {
-				wgateid: getQueryString("wgateid")
+				mobile: getQueryString("mobile")
 			},
 			success: function(data) {
 			           var info = eval('('+data+')');					   
@@ -187,33 +192,53 @@ function setRankText(){
 		});
 
 }
-function checkcount(){
+
+function countFeed(){
+			$.ajax({
+				type: 'GET',
+				url: "http://xz.lifejrj.cn:8080/api/countFeed.json",
+				data: {
+					mobile : getQueryString("mobile"),
+				},
+				success: function(data) {
+
+					checkcount(data);
+
+				},
+				error: function() {
+					return null;
+				}
+			});
+	}
+
+function checkcount(countFeed){
 
 		//检查是否可玩
 		$.ajax({
 					type: 'GET',
 					url: "action/checkcount.php",
 					data: {
-						wgateid: getQueryString("wgateid")
+						mobile: getQueryString("mobile"),
+						ingame:0,
 					},
 					success: function(data) {
 
-						if(eval('('+data+')')!="0")
-						{
-						   location.href="index2.php?wgateid="+getQueryString("wgateid");
+						var checkcount = data;
+
+						if ((checkcount - 3) <= countFeed) {
+							//do nothing
+						}else{
+							location.href="index.php?mobile="+getQueryString("mobile");
 						}
-						else
-						{
-							alert("您的游戏机会已用完，分享后可获得一次游戏机会！");
-							return false;
-						}
+
 					},
 					error: function() {
-						alert("checkcount出错了");
-						return null;
+						// alert("checkcount出错了");
+						return 0;
 					}
 				});
 }
+
 
 
 function checkwgateid(){
@@ -238,12 +263,10 @@ function checkwgateid(){
 					return null;
 				}
 			});
-	
-
 }
 
-        function baoming() {
-            var tel = $("#phone").val();
+function baoming() {
+            var tel = getQueryString("mobile");
             var telReg = /^(?:13\d|15\d|18\d)\d{5}(\d{3}|\*{3})$/;
 
             if (tel == '') {
@@ -258,33 +281,32 @@ function checkwgateid(){
 			//提交
 			 $.ajax({
 			type: 'GET',
-			url: "action/submit.php",
+			url: "http://xz.lifejrj.cn:8080/api/hasUser.json",
 			data: {
-				wgateid: getQueryString("wgateid"),
-				phone:tel
+				mobile:tel
 			},
 			success: function(data) {
-
 				if(eval('('+data+')')==true)
 				{
-
-			       form_close();
-				   
+			       // form_close();
+			       window.fromapp = true;
+			       $('#footerbanner').hide();
 				}
 				else
 				{
-					alert("报名失败！原因:"+data);
+					window.fromapp = false;
+					$('#footerbanner').show();
 				}
 			},
 			error: function() {
-				alert("submit出错啦");
-				return null;
+				window.fromapp = false;
+				$('#footerbanner').show();
 			}
 		});
 	
-        }
-		
+   }
 
+		
 function getQueryString(name) { 
 	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); 
 	var r = window.location.search.substr(1).match(reg); 

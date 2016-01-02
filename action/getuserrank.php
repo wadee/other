@@ -1,15 +1,15 @@
 <?php
 require "../config.php";
-$wgateid=$_GET['wgateid'];
+$mobile=$_GET['mobile'];
 
 
-$sql="select count(1) as userrank from ".$tablename." where score >= (select score from ".$tablename." where id = '".$wgateid."')";
+$sql="select count(1) as userrank from ".$tablename." where score >= (select score from ".$tablename." where phonenum = '".$mobile."')";
 $result=mysql_query($sql,$myconn);
 while($row = mysql_fetch_array($result))
 {
     echo '{"rank":"'.($row[0]).'",';
 	
-	$sql2="select score from ".$tablename." where id = '".$wgateid."'";
+	$sql2="select score from ".$tablename." where phonenum = '".$mobile."'";
 	$result2=mysql_query($sql2,$myconn);
 	while($row2 = mysql_fetch_array($result2))
 	{			

@@ -23,6 +23,6 @@ if ($row == false) {
     echo 0;
     exit;
 }
-echo $row;
+echo $row['current_count'];
 
 ?>

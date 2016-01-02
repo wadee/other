@@ -30,9 +30,6 @@
 <script src="src/game.min.js"></script>
 <script src="jquery.min.js" type="text/javascript"></script> 
 <div style="display:none">
-<?php
-require "wxconfig.php" ;
-?>
 </div>
 
 <script language=javascript>
@@ -42,14 +39,16 @@ require "wxconfig.php" ;
 	if (r != null) return unescape(r[2]); return null; 
 } 
 
-checkcount();
+checkwgateid();
+countFeed();
+// baoming();
 
-function countFeed(tele){
+function countFeed(){
 			$.ajax({
 				type: 'GET',
 				url: "http://xz.lifejrj.cn:8080/api/countFeed.json",
 				data: {
-					mobile : tele
+					mobile : getQueryString("mobile"),
 				},
 				success: function(data) {
 
@@ -64,7 +63,6 @@ function countFeed(tele){
 
 				},
 				error: function() {
-					alert("checkwgateid出错了");
 					return null;
 				}
 			});
@@ -84,10 +82,11 @@ function checkcount(countFeed){
 
 						var checkcount = data;
 
-						if ((checkcount - 2) <= countFeed) {
-							location.href="index2.php?mobile="+getQueryString("mobile");
+						if ((checkcount - 3) <= countFeed) {
+							//do nothing
+							//location.href="index2.php?mobile="+getQueryString("mobile");
 						}else{
-							share_show();
+							location.href="index.php?mobile="+getQueryString("mobile");
 						}
 
 						// if(eval('('+data+')')!="0")
@@ -108,6 +107,81 @@ function checkcount(countFeed){
 					}
 				});
 }
+
+function checkwgateid(){
+	$.ajax({
+					type: 'GET',
+					url: "action/checkwgateid.php",
+					data: {
+						mobile: getQueryString("mobile")	
+					},
+					success: function(data) {
+						if(data == 0){
+							addcount();
+						}
+					},
+					error: function() {
+						alert("checkcount出错了");
+						return null;
+					}
+				});	
+}
+
+function addcount(){
+
+		$.ajax({
+					type: 'GET',
+					url: "action/addcount.php",
+					data: {
+						mobile: getQueryString("mobile")	
+					},
+					success: function(data) {
+					  // location.href="index2.php?mobile="+getQueryString("mobile");
+					},
+					error: function() {
+						alert("checkcount出错了");
+						return null;
+					}
+				});
+}
+
+function baoming() {
+            var tel = getQueryString("mobile");
+            var telReg = /^(?:13\d|15\d|18\d)\d{5}(\d{3}|\*{3})$/;
+
+            if (tel == '') {
+                alert('请填写手机号！');
+                return;
+            }
+            if (!telReg.test(tel)) {
+                alert('请填写正确的手机号！');
+                return;
+            }
+			
+			//提交
+			 $.ajax({
+			type: 'GET',
+			url: "http://xz.lifejrj.cn:8080/api/hasUser.json",
+			data: {
+				mobile:tel
+			},
+			success: function(data) {
+				if(eval('('+data+')')==true)
+				{
+			       // form_close();
+			       window.fromapp = true;
+				}
+				else
+				{
+					window.fromapp = false;
+				}
+			},
+			error: function() {
+				window.fromapp = true;
+			}
+		});
+	
+        }
 
 		var mebtnopenurl = 'http://www.weiadmin.cn/index.php?g=Wap&m=Index&a=index&token=xkfcxd1402407094&from=singlemessage&isappinstalled=0';
 
@@ -165,11 +239,9 @@ function checkcount(countFeed){
 								data: {
 									mobile: getQueryString("mobile"),
 									score:score
-					
 								},
 								success: function(data) {
 										
-									
 								},
 								error: function() {
 									alert("submitscore出错啦");

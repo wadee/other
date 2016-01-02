@@ -274,7 +274,7 @@ function countFeed(){
                 return;
             }
 			
-			window.fromapp = true;
+			location.href="index2.php?mobile="+getQueryString("mobile");
 
 			return;
 			//提交
