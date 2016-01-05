@@ -81,7 +81,7 @@
 <div class="form_kuang">
 <img src="./qqgame_files/userform.png" alt="" width="90%">
 <div class="dlg_submit">
-<div class="input_row"><span class="label" style="font-size:16px;">手机号：</span><input type="text" id="phone" value="<?=$_GET['mobile']?>"></div>
+<div class="input_row"><span class="label" style="font-size:16px;">手机号：</span><input type="text" id="phone" value="<?php if(isset($_GET['mobile'])){ echo $_GET['mobile']; }?>"></div>
 <div class="dlg_submitbtn button"><a href="javascript:void(0);" onclick="baoming();"><img class="big_head" src="./qqgame_files/sendbtn.png" alt="" width="40%"></a></div>
 </div>
 </div>
@@ -148,6 +148,15 @@ function form_close(){
 }
 
 function game_start(){
+	var phone =  getQueryString("mobile");
+	var telReg = /^(?:13\d|15\d|18\d)\d{5}(\d{3}|\*{3})$/;
+
+    if (phone == '') {
+        return;
+    }
+    if (!telReg.test(phone)) {
+        return;
+    }
 	 checkwgateid();	
 	 countFeed();
 }
@@ -205,7 +214,7 @@ function checkcount(countFeed){
 						var checkcount = data;
 
 						if ((checkcount - 3) <= countFeed) {
-							location.href="index2.php?mobile="+getQueryString("mobile");
+							location.href="index2.php?mobile=" + $('#phone').val();
 						}else{
 							share_show();
 						}
@@ -233,12 +242,20 @@ function checkcount(countFeed){
 
 function checktelephone(){
 	var phone = $('#phone').val();
+	var telReg = /^(?:13\d|15\d|18\d)\d{5}(\d{3}|\*{3})$/;
 
-	if (!phone) {
-		form_show();		
-	}else{
-		baoming();
-	};
+    if (phone == '') {
+        alert('请填写手机号！');
+        form_show();
+        return;
+    }
+    if (!telReg.test(phone)) {
+        alert('请填写正确的手机号！');
+        form_show();
+        return;
+    }
+
+	baoming();
 
 }
 
@@ -286,10 +303,11 @@ function countFeed(){
 				{
 			       // form_close();
 			       window.fromapp = true;
+                    game_start();
 				}
 				else
 				{
-					location.href="index2.php?mobile="+getQueryString("mobile");
+					location.href="index2.php?mobile="+$('#phone').val();
 				}
 			},
 			error: function() {

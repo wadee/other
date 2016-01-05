@@ -39,9 +39,32 @@
 	if (r != null) return unescape(r[2]); return null; 
 } 
 
+
+
+checkphone();
+
 checkwgateid();
 countFeed();
 // baoming();
+
+
+function checkphone(){
+
+	var mobile = getQueryString("mobile");
+	var telReg = /^(?:13\d|15\d|18\d)\d{5}(\d{3}|\*{3})$/;
+
+	if (mobile == '') {
+	    alert('请填写手机号！');
+	    location.href="index.php";
+	    return;
+	}
+	if (!telReg.test(mobile)) {
+	    alert('请填写正确的手机号！');
+	    location.href="index.php";
+	    return;
+	}
+}
+
 
 function countFeed(){
 			$.ajax({
